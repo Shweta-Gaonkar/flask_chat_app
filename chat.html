@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room - {{ room }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Room: {{ room }}</h2>
+    <div id="messages" class="chat-box"></div>
+    <form id="chatForm">
+      <input type="text" id="message" placeholder="Type a message..." autocomplete="off" required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+    const username = "{{ username }}";
+    const room = "{{ room }}";
+
+    socket.emit("join", { username, room });
+
+    const form = document.getElementById("chatForm");
+    const messageInput = document.getElementById("message");
+    const messagesDiv = document.getElementById("messages");
+
+    socket.on("message", data => {
+      const p = document.createElement("p");
+      p.textContent = data.msg;
+      messagesDiv.appendChild(p);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const msg = messageInput.value.trim();
+      if (msg) {
+        socket.emit("send_message", {
+          username,
+          message: msg,
+          room
+        });
+        messageInput.value = "";
+      }
+    });
+  </script>
+</body>
+</html>

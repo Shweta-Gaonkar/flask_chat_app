@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flask Chat App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome to Flask Chat 💬</h2>
+    <form action="{{ url_for('chat') }}" method="get">
+      <input type="text" name="username" placeholder="Enter your name" required>
+      <select name="room" required>
+        <option value="" disabled selected>-- Select Room --</option>
+        {% for room in rooms %}
+          <option value="{{ room }}">{{ room }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Join Room</button>
+    </form>
+
+    <h3>Create a New Room</h3>
+    <input type="text" id="newRoom" placeholder="Room name">
+    <button onclick="createRoom()">Create Room</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+
+    function createRoom() {
+      const room = document.getElementById("newRoom").value;
+      if (room) {
+        socket.emit("create_room", { room });
+        document.getElementById("newRoom").value = "";
+        alert(`Room "${room}" created! Refresh to join.`);
+      }
+    }
+  </script>
+</body>
+</html>
